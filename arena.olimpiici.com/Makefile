@@ -78,7 +78,7 @@ TESTS_DIR=${TESTED_DIR}/data/tests/
 PROPS_FILE=${TESTED_DIR}/data/grade.properties
 
 # READ limits
-eval "$(grep '=' .test-data/regional-e-2009-song/data/grade.properties | sed 's/^/MAX_/')"
+eval "$(grep '=' .test-data/${TESTED}/data/grade.properties | sed 's/^/MAX_/')"
 
 
 echo "[${TESTED}]" Create results directory: ${RESULTS_DIR}
