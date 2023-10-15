@@ -125,25 +125,32 @@ output_time(){
 
 echo "[${TESTED}]" Create results summary file ${SUMMARY}
 echo "***** Begin testrun `date -Is`"  > ${SUMMARY}
+SUCCESS_COUNT=0
+FAIL_COUNT=0
 for f in ${TESTS_DIR}*.sol; do
 	BN=$(basename ${f%.sol})
+
 	if [ -s ${RESULTS_DIR}${BN}.err ]; then
 		echo "* $BN.in : FAIL (`output_time ${RESULTS_DIR}${BN}.time`)" >> ${SUMMARY}
 		cat ${RESULTS_DIR}${BN}.err >> ${SUMMARY}
+		FAIL_COUNT=$(( ${FAIL_COUNT} + 1 ))
 	elif diff -W130 -y -ZBb $f ${RESULTS_DIR}${BN}.out > ${RESULTS_DIR}${BN}.diff; then
 		echo "* $BN.in : PASS (`output_time ${RESULTS_DIR}${BN}.time`)" >> ${SUMMARY}
 		rm ${RESULTS_DIR}${BN}.diff;
 		rm ${RESULTS_DIR}${BN}.err;
+		SUCCESS_COUNT=$(( ${SUCCESS_COUNT} + 1 ))
 	else
 		echo "* $BN.in : FAIL (`output_time ${RESULTS_DIR}${BN}.time`)" >> ${SUMMARY}
 		printf '%.30s%65s\n' "$BN.sol" "$BN.out" "================" "===================" >> ${SUMMARY}
 		cat ${RESULTS_DIR}${BN}.diff >> ${SUMMARY}
+		FAIL_COUNT=$(( ${FAIL_COUNT} + 1 ))
 	fi
 done
 
 echo "***** Summary:"  >> ${SUMMARY}
 echo "Ran:         " $(ls -1 ${RESULTS_DIR}*.out | wc -l) >> ${SUMMARY}
-echo "Failed:      " $(ls -1 ${RESULTS_DIR}*.diff ${RESULTS_DIR}*.err 2> /dev/null | wc -l) >> ${SUMMARY}
+echo "Passed:      " ${SUCCESS_COUNT} >> ${SUMMARY}
+echo "Failed:      " ${FAIL_COUNT} >> ${SUMMARY}
 echo "[${TESTED}]" Complete
 
 endef
